@@ -1,11 +1,15 @@
 const mongoose = require('mongoose');
+const validator = require('validator')
 
 const tourSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'A tour field  must be provided'],
+    minLength: [2, 'A name should be greter than or equal to 2 characters'],
+    maxLength: [250, 'A name should be less than or equal to 250 characters'],
     unique: true,
     trim: true,
+    validate: [validator.isAlpha, 'Name of a tour must be a string']
   },
 
   duration: {
@@ -21,6 +25,10 @@ const tourSchema = new mongoose.Schema({
   difficulty: {
     type: String,
     required: [true, 'A tour field must be provided'],
+    enum: {
+      values: ['easy', 'medium', 'difficult'],
+      message: 'Please select from easy, medium and difficult'
+    }
   },
 
   price: {
@@ -31,6 +39,8 @@ const tourSchema = new mongoose.Schema({
   ratingsAverage: {
     type: Number,
     default: 4.4,
+    min: [0, 'Ratings should be in the range 0-5'],
+    max: [5, 'Ratings should be in the range 0-5']
   },
 
   ratingsQuantity: {
@@ -40,6 +50,15 @@ const tourSchema = new mongoose.Schema({
 
   priceDiscount: {
     type: Number,
+    validate: {
+      validator: function(val){
+
+        /* Can only use 'this' in validator with inserts and 
+         'this' will points to the current new document NOT ON UPDATES */
+        return val < this.price;
+      },
+      message: 'The discount value({VALUE}) is higher than the price'
+    }
   },
 
   summary: {
@@ -67,7 +86,12 @@ const tourSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
     required: [true, 'A tour field must be provided'],
-    selected: false
+    select: false
+  },
+
+  secretTour: {
+    type: "Boolean",
+    default: false
   },
 
   startDates: {
@@ -97,8 +121,9 @@ tourSchema.virtual('durationWeeks').get(function (){
 
 */
 
-tourSchema.pre('save', function(){
-  console.log(this);
+tourSchema.pre('save', function(next){
+  // console.log(this);
+  next();
 });
 
 // ------------------------------------------------
@@ -108,15 +133,44 @@ tourSchema.pre('save', function(){
 2. POST:
     post middleware will be called after .save() or .create() right
     after inserting the document to the database and we will have 
-    access to it so to tweak it
+    access to it so to tweak it and have access to the current document
+    inserted and the next() func
 
 */
 
-tourSchema.post('save', function(){
-  console.log(this);
+tourSchema.post('save', function(doc, next){
+  // console.log(this);
+  next();
 });
 
-// ####################################################################
+
+// #######################  QUERY (mongoose) MIDDLEWARE  #############################
+
+tourSchema.pre(/^find/, function(next){
+  this.find({secretTour: {$ne: 'true'}});
+  this.startTime = Date.now();
+  next();
+});
+
+tourSchema.post(/^find/, function(docs, next){
+  console.log(`Query took: ${(Date.now() - this.startTime) / 1000} sec`);
+  next();
+});
+
+// #######################  AGGREGATION (mongoose) MIDDLEWARE  #############################
+
+tourSchema.pre('aggregate', function(next){
+  this.pipeline().unshift(
+    {
+      $match: {
+        secretTour: {$ne: 'true'}
+      }
+    }
+  );
+
+  next();
+});
+
 
 const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;

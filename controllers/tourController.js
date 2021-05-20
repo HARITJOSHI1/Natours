@@ -28,20 +28,20 @@ class APIfeatures {
     return this;
   };
 
-  // 3. Sorting
+  // 2. Sorting
   sort = () => {
     if (this.queryString.sort) {
       const sortBy = this.queryString.sort.split(',').join(' ');
       this.query = this.query.sort(sortBy);
       return this;
-      // query = query.sort('(sort-criteria) (other sort criteria ...)')
+      // query = query.sort('(field name) (other field name ...)')
     } else {
       this.query = this.query.sort('-createdAt');
       return this;
     }
   };
 
-  // 4. Limiting fields (projection)
+  // 3. Limiting fields (projection)
   fields = () => {
     if (this.queryString.fields) {
       const fieldBy = this.queryString.fields.split(',').join(' ');
@@ -53,7 +53,7 @@ class APIfeatures {
     }
   };
 
-  // 5. Pagination
+  // 4. Pagination
   page = (total) => {
     const page = +this.queryString.page || 1;
     const limit = +this.queryString.limit || 10;
@@ -65,7 +65,7 @@ class APIfeatures {
     }
 
     if (total <= skip) {
-      throw new Error('Page out of bound');
+      throw new Error('Page out not found');
     }
     return this;
   };
@@ -237,8 +237,8 @@ exports.getPlan = async (req, res) => {
       {
         $match: {
           startDates: {
-            $gt: new Date(`${year}-01-01`),
-            $lt: new Date(`${year}-12-31`),
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
           },
         },
       },
