@@ -5,6 +5,8 @@ const APIfeatures = require('./APIFeatureClass');
 
 const tours = require('./../models/tourModel');
 const catchAsync = require('./../utils/catchAsync');
+const AppError = require('./../utils/AppError');
+const Errors = require('./../utils/Errors');
 
 // #################################################################
 
@@ -35,9 +37,7 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     results: allTours.length,
-    data: {
-      allTours,
-    },
+    allTours,
   });
 });
 
@@ -61,6 +61,14 @@ exports.getSingleTour = catchAsync(async (req, res, next) => {
   // resData = JSON.stringify(resData);
   // console.log(resData);
 
+  if (!resData) {
+    const err = new AppError(
+      `Could not find any tour with that ID ${req.params.id}`,
+      404
+    );
+    return next(err);
+  }
+
   res.status(200).json({
     status: 'success',
     data: resData,
@@ -74,6 +82,14 @@ exports.updateTour = catchAsync(async (req, res, next) => {
     runValidators: true,
   });
 
+  if (!updatedTour) {
+    const err = new AppError(
+      `Could not find any tour with that ID ${req.params.id}`,
+      404
+    );
+    return next(err);
+  }
+
   res.status(200).json({
     status: 'success',
     updatedTour,
@@ -83,6 +99,16 @@ exports.updateTour = catchAsync(async (req, res, next) => {
 exports.deleteTour = catchAsync(async (req, res, next) => {
   const id = req.params.id;
   const deleteTour = await tours.deleteOne({ _id: id });
+  console.log(deleteTour);
+
+  if (!deleteTour.n) {
+    const err = new AppError(
+      `Could not find any tour with that ID ${req.params.id}`,
+      404
+    );
+    return next(err);
+  }
+
   res.status(200).json({
     status: 'success',
     message: `Deleted the document with id ${id}`,
@@ -112,12 +138,19 @@ exports.getTourStats = catchAsync(async (req, res, next) => {
     },
   ]);
 
+  if (!stats) {
+    const err = new AppError(
+      `Could not find any tour with that ID ${req.params.id}`,
+      404
+    );
+    return next(err);
+  }
+
   res.status(200).json({
     status: 'success',
     stats,
   });
 });
-
 
 // ##############################################################################
 
@@ -162,8 +195,12 @@ exports.getPlan = catchAsync(async (req, res, next) => {
     },
   ]);
 
-  if (plan.length === 0) {
-    throw new Error('No tour was found');
+  if (plan.length === 0 || !plan) {
+    const err = new AppError(
+      `Could not find any tour with that ID ${req.params.id}`,
+      404
+    );
+    return next(err);
   }
 
   res.status(200).json({

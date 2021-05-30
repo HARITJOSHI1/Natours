@@ -4,7 +4,7 @@ const app = express();
 const tourRoute = require('./routes/tourRoutes');
 const userRoute = require('./routes/userRoutes');
 const AppError = require('./utils/AppError');
-const error = require('./utils/errors');
+const Errors = require('./utils/Errors');
 
 // APP MIDDLEWARE
 
@@ -24,7 +24,7 @@ app.all('*', function (req, res, next) {
 });
 
 // middleware to call error func()
-app.use(error);
+app.use(Errors);
 
 
 // Exporting app
