@@ -4,6 +4,8 @@ const express = require('express');
 const APIfeatures = require('./APIFeatureClass');
 
 const tours = require('./../models/tourModel');
+
+// Error Handlers
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/AppError');
 const Errors = require('./../utils/Errors');
