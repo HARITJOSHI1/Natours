@@ -1,5 +1,6 @@
 const express = require('express');
 const tourController = require('./../controllers/tourController');
+const authController = require('./../controllers/authController');
 
 ///////////////////////////////////////////////
 // Fetching all data
@@ -33,6 +34,6 @@ router
   .delete(tourController.deleteTour);
 
 // Fetching all data and sending data to server
-router.route('/').get(tourController.getAllTours).post(tourController.postTour);
+router.route('/').get(authController.protect, tourController.getAllTours).post(tourController.postTour);
 
 module.exports = router;

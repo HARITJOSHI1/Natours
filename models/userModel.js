@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     trim: true,
+    select: false,
     required: [true, 'Please enter your password'],
     minLength: [8, 'Please enter a password more than 8 characters'],
     maxLength: [250, 'Please enter a password less than 250 characters'],
@@ -50,6 +51,10 @@ const userSchema = new mongoose.Schema({
       message: 'Please recheck your password',
     },
   },
+
+  passCreatedAt: {
+    type: Date
+  }
 });
 
 // Encrypt passwords:
@@ -65,4 +70,17 @@ userSchema.pre('save', async function(next){
   next();
 });
 
+
+// Instance method available to all the documents in a particular collection
+userSchema.methods.correctPassword = async function(candidatePass, userPass){
+  return await bcrypt.compare(candidatePass, userPass);
+};
+
+userSchema.methods.changedPassword = function(JWTtime){
+  this.passCreatedAt = (this.passCreatedAt.getTime() / 1000);
+  if(this.passCreatedAt > JWTtime) return true;
+  return false;
+}
+
 module.exports = mongoose.model('User', userSchema);
+

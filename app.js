@@ -26,6 +26,5 @@ app.all('*', function (req, res, next) {
 // middleware to call error func()
 app.use(Errors);
 
-
 // Exporting app
 module.exports = app;
