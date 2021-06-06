@@ -77,7 +77,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   console.log(decoded);
 
   // 3. Check if user still exists
-  const freshUser = await User.findById(decode.id);
+  const freshUser = await User.findById(decoded.id);
   if (!freshUser)
     return next(
       new AppError("The user belonging to this token doesn't exist"),
@@ -85,7 +85,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
 
   // 4. Check if user changed password after the token was issued
-  if(freshUser.changePassword(decoded.iAt)){
+  if(freshUser.changedPassword(decoded.iat)){
     return next(new AppError("The password is changed so please login again"), 400);
   }    
 

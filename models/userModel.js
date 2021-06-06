@@ -53,34 +53,37 @@ const userSchema = new mongoose.Schema({
   },
 
   passCreatedAt: {
-    type: Date
-  }
+    type: Date,
+  },
 });
 
 // Encrypt passwords:
-userSchema.pre('save', async function(next){
+userSchema.pre('save', async function (next) {
   // runs if password was actually modified
-  if(!this.isModified('password')) return next();
+  if (!this.isModified('password')) return next();
 
   // Hashing password with cost 12
-  this.password = await bcrypt.hash(this.password, 12);   // returns promise
+  this.password = await bcrypt.hash(this.password, 12); // returns promise
 
   // Delete passwordComfirm field
   this.passwordConfirm = undefined;
   next();
 });
 
-
 // Instance method available to all the documents in a particular collection
-userSchema.methods.correctPassword = async function(candidatePass, userPass){
+userSchema.methods.correctPassword = async function (candidatePass, userPass) {
   return await bcrypt.compare(candidatePass, userPass);
 };
 
-userSchema.methods.changedPassword = function(JWTtime){
-  this.passCreatedAt = (this.passCreatedAt.getTime() / 1000);
-  if(this.passCreatedAt > JWTtime) return true;
+userSchema.methods.changedPassword = function (JWTtime) {
+  if (this.passCreatedAt) {
+    const changedPassTimestamp = parseInt(
+      this.passCreatedAt.getTime() / 1000,
+      10
+    );
+    return changedPassTimestamp > JWTtime;
+  }
   return false;
-}
+};
 
 module.exports = mongoose.model('User', userSchema);
-
