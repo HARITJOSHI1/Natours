@@ -31,7 +31,7 @@ router
   .route('/:id')
   .get(tourController.getSingleTour)
   .patch(tourController.updateTour)
-  .delete(tourController.deleteTour);
+  .delete(authController.protect, authController.restrictTo('admin', 'legal-guide'), tourController.deleteTour);
 
 // Fetching all data and sending data to server
 router.route('/').get(authController.protect, tourController.getAllTours).post(tourController.postTour);
