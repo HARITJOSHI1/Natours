@@ -78,8 +78,8 @@ exports.getSingleTour = catchAsync(async (req, res, next) => {
 });
 
 exports.updateTour = catchAsync(async (req, res, next) => {
-  const id = await tours.findById(req.params.id);
-  const updatedTour = await tours.findByIdAndUpdate(id, req.body, {
+  const toBeUpdated = await tours.findById(req.params.id);
+  const updatedTour = await tours.findByIdAndUpdate(toBeUpdated, req.body, {
     new: true,
     runValidators: true,
   });
@@ -101,8 +101,7 @@ exports.updateTour = catchAsync(async (req, res, next) => {
 exports.deleteTour = catchAsync(async (req, res, next) => {
   const id = req.params.id;
   const deleteTour = await tours.deleteOne({ _id: id });
-  console.log(deleteTour);
-
+  
   if (!deleteTour.n) {
     const err = new AppError(
       `Could not find any tour with that ID ${req.params.id}`,
