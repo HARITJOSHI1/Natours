@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
         alphaNum.forEach((i) => {
           if (val.includes(i)) c += 1;
         });
-        console.log(c);
+
         return c ? true : false;
       },
       message: 'Please enter a strong password',
@@ -67,8 +67,8 @@ const userSchema = new mongoose.Schema({
   },
 
   passResetTokenexp: {
-    type: Date
-  }
+    type: Date,
+  },
 });
 
 // Encrypt passwords:
@@ -81,6 +81,13 @@ userSchema.pre('save', async function (next) {
 
   // Delete passwordComfirm field
   this.passwordConfirm = undefined;
+  next();
+});
+
+// Update passCreatedAt when password is reset
+userSchema.pre('save', function (next){
+  if(!this.isModified('password') || this.isNew) return next();
+  this.passCreatedAt = Date.now() - 1000;
   next();
 });
 
