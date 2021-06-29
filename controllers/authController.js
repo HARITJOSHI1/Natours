@@ -171,11 +171,11 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   const user = await User.findOne({
     resetToken: hashedToken,
-    passResetTokenexp: { $gt: Date.now() }
+    passResetTokenexp: { $gt: Date.now() },
   });
 
   // 2. If token is expired and user doesn't exists, send the error
-  if(!user) return next(new AppError("Token is invalid or expired", 400));
+  if (!user) return next(new AppError('Token is invalid or expired', 400));
 
   // 3. Change the original password (reset) and delete reset token
   user.password = req.body.password;
@@ -183,13 +183,43 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.resetToken = undefined;
   user.passResetTokenexp = undefined;
 
-  await user.save({validateBeforeSave: false});
+  await user.save();
 
   // 4. Log the user inside the app (send JWT)
   const token = signToken(user._id);
   res.status(200).json({
     status: 'success',
-    message: "Password is successfully updated!",
+    message: 'Password is successfully updated!',
+    token,
+  });
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1. Get the user from collection
+  const userID = req.user._id;
+  const user = await User.findById(userID).select('+password');
+  if (!user) return next(new AppError('User does not exist', 401));
+
+  // 2. Verify the posted password
+  const pass = req.body.password;
+  const passConfirm =  req.body.passConfirm;
+  if (passConfirm !== user.password) {
+    return next(new AppError('Password is incorrect', 400));
+  }
+
+  // 3. Update the password
+  await User.updateOne(
+    { _id: user._id },
+    { $set: { password: pass } },
+    { new: true, runValidators: true }
+  );
+
+  // 4. Log in the user
+  const token = signToken(user._id);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Password updated successfully',
     token
   });
 });

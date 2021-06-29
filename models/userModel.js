@@ -69,6 +69,11 @@ const userSchema = new mongoose.Schema({
   passResetTokenexp: {
     type: Date,
   },
+
+  active: {
+    type: Boolean,
+    default: true
+  }
 });
 
 // Encrypt passwords:
@@ -81,6 +86,12 @@ userSchema.pre('save', async function (next) {
 
   // Delete passwordComfirm field
   this.passwordConfirm = undefined;
+  next();
+});
+
+// Query Middleware to only select active users
+userSchema.pre(/^find/, function(next){
+  this.find({active: {$ne: false}});
   next();
 });
 
@@ -114,7 +125,7 @@ userSchema.methods.createResetPasswordToken = function () {
     .update(resetToken)
     .digest('hex');
 
-  this.passResetTokenexp = Date.now() + 10 * 60 * 1000;
+  this.passResetTokenexp = Date.now() + (10 * 60 * 1000);
   return resetToken;
 };
 

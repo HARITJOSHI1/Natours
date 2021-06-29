@@ -11,17 +11,27 @@ router.post('/signup', authController.signUp);
 router.post('/login', authController.login);
 
 // Forgot password
-router.post('/forgotPassword', authController.forgotPassword);
+router.post('/forgotPassword', authController.protect, authController.forgotPassword);
 
 // Reset and update user password
-router.patch('/resetPassword/:token', authController.resetPassword);
+router.patch('/resetPassword/:token', authController.protect, authController.resetPassword);
+
+// Update password
+router.patch('/updatePassword', authController.protect, authController.updatePassword);
+
+// Update Me
+router.patch('/updateMe', authController.protect, userController.updateMe);
+
+// Delete / Deactivate Me
+router.delete('/deleteMe', authController.protect, userController.deleteMe);
+
 
 // CRUD 
 router.route('/').get(userController.getAllUsers).post(userController.addUser);
 router
   .route('/:id')
   .get(userController.getUser)
-  .patch(userController.updateUser)
-  .delete(userController.deleteUser);
+  .patch(authController.protect, userController.updateUser)
+  .delete(authController.protect, userController.deleteUser);
   
 module.exports = router;
