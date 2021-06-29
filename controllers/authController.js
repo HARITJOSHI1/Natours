@@ -143,6 +143,9 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       message,
     });
 
+    user.resetToken = undefined;
+    user.passResetTokenexp = undefined;
+    
     res.status(200).json({
       status: 'success',
       message: 'Token send to email !',
@@ -182,6 +185,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordConfirm = req.body.passwordConfirm;
   user.resetToken = undefined;
   user.passResetTokenexp = undefined;
+  user.passwordConfirm = undefined;
 
   await user.save();
 
