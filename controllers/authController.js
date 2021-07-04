@@ -11,11 +11,22 @@ const signToken = (id) => {
   const t = jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_TIMEOUT,
   });
-
   return t;
 };
 
-exports.signUp = catchAsync(async (req, res, next) => {
+const sendCookie = (token, res) => {
+  const cookieOptions = {
+    expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+  };
+
+  if(process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+  else cookieOptions.secure = false;
+
+  res.cookie('jwt', token, cookieOptions);
+};
+
+exports.signUp = catchAsync(async (req, res) => {
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
@@ -25,6 +36,8 @@ exports.signUp = catchAsync(async (req, res, next) => {
   });
 
   const token = signToken(newUser._id);
+  sendCookie(token, res);
+  newUser.password = undefined;
 
   res.status(201).json({
     status: 'signedUp',
@@ -49,6 +62,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // 3. create token
   const token = signToken(user._id);
+  sendCookie(token, res);
 
   // 4. Send response
   res.status(200).json({
@@ -146,7 +160,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     user.resetToken = undefined;
     user.passResetTokenexp = undefined;
     await user.save({ validateBeforeSave: false });
-    
+
     res.status(200).json({
       status: 'success',
       message: 'Token send to email !',
@@ -155,7 +169,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     user.resetToken = undefined;
     user.passResetTokenexp = undefined;
     await user.save({ validateBeforeSave: false });
-    
+
     return next(
       new AppError(
         'There was an error to send the email! Please try again later.',
@@ -193,6 +207,8 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 4. Log the user inside the app (send JWT)
   const token = signToken(user._id);
+  sendCookie(token, res);
+
   res.status(200).json({
     status: 'success',
     message: 'Password is successfully updated!',
@@ -208,7 +224,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   // 2. Verify the posted password
   const pass = req.body.password;
-  const passConfirm =  req.body.passConfirm;
+  const passConfirm = req.body.passConfirm;
   if (passConfirm !== user.password) {
     return next(new AppError('Password is incorrect', 400));
   }
@@ -226,6 +242,6 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     message: 'Password updated successfully',
-    token
+    token,
   });
 });
