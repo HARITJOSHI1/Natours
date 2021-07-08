@@ -3,12 +3,12 @@ const express = require('express');
 // FEATURES OF OUR API Class:
 const APIfeatures = require('./APIFeatureClass');
 
-const tours = require('./../models/tourModel');
+const tours = require('../models/tourModel');
 
 // Error Handlers
-const catchAsync = require('./../utils/catchAsync');
-const AppError = require('./../utils/AppError');
-const Errors = require('./../utils/Errors');
+const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/AppError');
+const Errors = require('../utils/Errors');
 
 // #################################################################
 

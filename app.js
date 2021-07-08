@@ -13,6 +13,7 @@ const hpp = require('hpp');
 const app = express();
 const tourRoute = require('./routes/tourRoutes');
 const userRoute = require('./routes/userRoutes');
+const reviewRoute = require('./routes/reviewRoutes');
 const AppError = require('./utils/AppError');
 const Errors = require('./utils/Errors');
 
@@ -66,6 +67,7 @@ app.use('/api', limiter);
 // Mounting the router
 app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
+app.use('/api/v1/review', reviewRoute);
 
 // Handling unknown routes
 app.all('*', function (req, res, next) {

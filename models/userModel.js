@@ -57,7 +57,7 @@ const userSchema = new mongoose.Schema({
       message: 'Please recheck your password',
     },
   },
-
+  
   passCreatedAt: {
     type: Date,
   },
@@ -72,8 +72,8 @@ const userSchema = new mongoose.Schema({
 
   active: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
 });
 
 // Encrypt passwords:
@@ -90,14 +90,14 @@ userSchema.pre('save', async function (next) {
 });
 
 // Query Middleware to only select active users
-userSchema.pre(/^find/, function(next){
-  this.find({active: {$ne: false}});
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
   next();
 });
 
 // Update passCreatedAt when password is reset
-userSchema.pre('save', function (next){
-  if(!this.isModified('password') || this.isNew) return next();
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
   this.passCreatedAt = Date.now() - 1000;
   next();
 });
@@ -125,7 +125,7 @@ userSchema.methods.createResetPasswordToken = function () {
     .update(resetToken)
     .digest('hex');
 
-  this.passResetTokenexp = Date.now() + (10 * 60 * 1000);
+  this.passResetTokenexp = Date.now() + 10 * 60 * 1000;
   return resetToken;
 };
 

@@ -19,17 +19,18 @@ mongoose
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false,
+    useUnifiedTopology: true
   })
-  .then((con) => console.log('Database sucessfully connected'));
+  .then((con) => console.log('Database sucessfully connected [DEV-IMPORT]'));
 
 const readTours = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf8')
+  fs.readFileSync(`${__dirname}/tours.json`, 'utf8')
 );
 
 // Passing Array of object to create()
 const importDev = async () => {
   try {
-    const t = await tour.create(readTours);
+    await tour.create(readTours);
     console.log('Data successfully loaded !');
     process.exit(); // Brute exit
   } catch (error) {
@@ -40,7 +41,7 @@ const importDev = async () => {
 // Delete All the documents
 const deleteAllTour = async () => {
   try {
-    const d = await tour.deleteMany();
+    await tour.deleteMany();
     console.log('Data deleted successfully !');
     process.exit(); // Brute exit
   } catch (error) {
