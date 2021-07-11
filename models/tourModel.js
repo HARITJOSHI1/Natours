@@ -159,6 +159,12 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+tourSchema.virtual('reviews', {
+  ref: 'Review', 
+  foreignField: 'tour',
+  localField: '_id'
+});
+
 // #######################  DOCUMENT (mongoose) MIDDLEWARE  #############################
 
 tourSchema.pre('save', function(next){

@@ -54,14 +54,8 @@ exports.postTour = catchAsync(async (req, res) => {
 });
 
 exports.getSingleTour = catchAsync(async (req, res, next) => {
-  // const id = +req.params.id;
-  const resData = await tours.findById(req.params.id);
-  // let allTours = await tours.find();
-  // console.log(allTours);
-
-  // let resData = allTours.find((el, idx) => idx === id - 1);
-  // resData = JSON.stringify(resData);
-  // console.log(resData);
+  
+  const resData = await tours.findById(req.params.id).populate('reviews');
 
   if (!resData) {
     const err = new AppError(

@@ -6,6 +6,7 @@ const reviewSchema = new mongoose.Schema({
     type: Number,
     max: [5, 'Please choose a rating between 0 - 5'],
     min: [0, 'Please choose a rating between 0 - 5'],
+    default: 0
   },
   createdAt: Date,
   tour: {
@@ -25,12 +26,17 @@ reviewSchema.pre('save', function (next) {
 });
 
 reviewSchema.pre(/^find/, function (next) {
+  // this.populate({
+  //   path: 'tour',
+  //   select: 'name',
+  // }).populate({
+  //   path: 'user',
+  //   select: 'name photo',
+  // });
+
   this.populate({
-    path: 'tour',
-    select: 'name',
-  }).populate({
     path: 'user',
-    select: 'name -_id',
+    select: 'name photo',
   });
 
   next();

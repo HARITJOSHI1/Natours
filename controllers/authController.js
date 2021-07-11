@@ -192,7 +192,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     resetToken: hashedToken,
     passResetTokenexp: { $gt: Date.now() },
   });
-
+  console.log(user);
   // 2. If token is expired and user doesn't exists, send the error
   if (!user) return next(new AppError('Token is invalid or expired', 400));
 

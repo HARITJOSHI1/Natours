@@ -1,6 +1,7 @@
 const express = require('express');
 const tourController = require('./../controllers/tourController');
 const authController = require('./../controllers/authController');
+const reviewRouter = require('./../routes/reviewRoutes');
 
 ///////////////////////////////////////////////
 // Fetching all data
@@ -11,9 +12,11 @@ const authController = require('./../controllers/authController');
 
 ///////////////////////////////////////////////
 
-// Fetching specific data
-
 const router = express.Router();
+
+// Delegating to reviewRouter
+router.use('/:id/reviews', reviewRouter);
+
 // router.param('id', tourController.checkID);
 // router.use(tourController.checkData);
 
