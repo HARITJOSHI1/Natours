@@ -1,6 +1,7 @@
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/AppError');
+const factory = require('./functions/handlerFactory');
 
 function requiredUpdateObj(obj, ...allowedData) {
   const temp = {};
@@ -12,27 +13,17 @@ function requiredUpdateObj(obj, ...allowedData) {
   return temp;
 }
 
-exports.getAllUsers = catchAsync(async (req, res) => {
-  const allUsers = await User.find();
-  res.status(200).json({
-    status: 200,
-    allUsers,
-  });
-});
+exports.getId = (req, res, next) => {
+  if(!req.params.id) req.params.id = req.user.id;
+  next();
+}
 
-exports.addUser = (req, res) => {
-  res.status(500).json({
-    status: 500,
-    message: 'Route is not implemented',
-  });
-};
-
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: 500,
-    message: 'Route is not implemented',
-  });
-};
+exports.getAllUsers = factory.readSingleOrAll(User);
+exports.getUser = factory.readSingleOrAll(User, 'single');
+exports.createUser = factory.postData(User);
+exports.updateUser = factory.updateData(User);
+exports.deleteUser = factory.deleteDoc(User);
+exports.getMe = factory.readSingleOrAll(User, 'single');
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.confirmPassword) {
@@ -59,26 +50,11 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.updateUser = catchAsync(async (req, res) => {
-  res.status(500).json({
-    status: 500,
-    message: 'Route is not implemented',
-  });
-});
 
 exports.deleteMe = catchAsync(async (req, res) => {
   await User.findByIdAndUpdate(req.user._id, {active: false});
   res.status(204).json({
     status: "success",
     message: 'User is deleted successfully',
-  });
-});
-
-exports.deleteUser = catchAsync(async (req, res) => {
-  const id = req.params.id;
-  await User.findByIdAndDelete(id);
-  res.status(200).json({
-    status: "success",
-    message: 'Account is deleted permanently',
   });
 });

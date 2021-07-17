@@ -21,22 +21,45 @@ router.use('/:id/reviews', reviewRouter);
 // router.use(tourController.checkData);
 
 // Aliasing route
-router.route('/top-5-tours').get(tourController.topFiveTours, tourController.getAllTours);
+router
+  .route('/top-5-tours')
+  .get(tourController.topFiveTours, tourController.getAllTours);
 
 // Statistics of the tour
 router.route('/statistics').get(tourController.getTourStats);
 
 // SOLUTION
-router.route('/get-busy-month/:year').get(tourController.getPlan);
+router
+  .route('/get-busy-month/:year')
+  .get(
+    authController.protect,
+    authController.restrictTo('admin', 'legal-guide', 'guide'),
+    tourController.getPlan
+  );
 
 // For specific tour
 router
   .route('/:id')
   .get(tourController.getSingleTour)
-  .patch(tourController.updateTour)
-  .delete(authController.protect, authController.restrictTo('admin', 'legal-guide'), tourController.deleteTour);
+  .patch(
+    authController.protect,
+    authController.restrictTo('admin', 'legal-guide'),
+    tourController.updateTour
+  )
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin', 'legal-guide'),
+    tourController.deleteTour
+  );
 
 // Fetching all data and sending data to server
-router.route('/').get(authController.protect, tourController.getAllTours).post(tourController.postTour);
+router
+  .route('/')
+  .get(tourController.getAllTours)
+  .post(
+    authController.protect,
+    authController.restrictTo('admin', 'legal-guide'),
+    tourController.postTour
+  );
 
 module.exports = router;
