@@ -89,16 +89,16 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// Query Middleware to only select active users
-userSchema.pre(/^find/, function (next) {
-  this.find({ active: { $ne: false } });
-  next();
-});
-
 // Update passCreatedAt when password is reset
 userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
   this.passCreatedAt = Date.now() - 1000;
+  next();
+});
+
+// Query Middleware to only select active users
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
   next();
 });
 

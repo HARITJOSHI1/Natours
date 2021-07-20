@@ -16,6 +16,7 @@ const router = express.Router();
 
 // Delegating to reviewRouter
 router.use('/:id/reviews', reviewRouter);
+router.use('/reviews', reviewRouter);
 
 // router.param('id', tourController.checkID);
 // router.use(tourController.checkData);

@@ -6,9 +6,9 @@ const Review = require('../../models/reviewModel');
 exports.deleteDoc = (Model) =>
   catchAsync(async (req, res, next) => {
     const id = req.params.id;
-    const deleteDoc = await Model.deleteOne({ _id: id });
+    const deleteDoc = await Model.findByIdAndDelete({ _id: id });
 
-    if (!deleteDoc.n) {
+    if (!deleteDoc) {
       const err = new AppError(
         `Could not find any document with that ID ${req.params.id}`,
         404

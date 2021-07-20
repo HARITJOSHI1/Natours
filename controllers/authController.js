@@ -20,7 +20,7 @@ const sendCookie = (token, res) => {
     httpOnly: true,
   };
 
-  if(process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
   else cookieOptions.secure = false;
 
   res.cookie('jwt', token, cookieOptions);
@@ -91,7 +91,7 @@ exports.protect = catchAsync(async (req, res, next) => {
       new AppError('You are not logged in! Please log in to get access', 401)
     );
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-
+  
   // 3. Check if user still exists
   const currentUser = await User.findById(decoded.id);
   if (!currentUser) {
@@ -195,7 +195,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordConfirm = req.body.passwordConfirm;
   user.resetToken = undefined;
   user.passResetTokenexp = undefined;
-  
+
   await user.save();
 
   // 4. Log the user inside the app (send JWT)
