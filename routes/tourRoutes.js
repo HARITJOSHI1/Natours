@@ -26,6 +26,13 @@ router
   .route('/top-5-tours')
   .get(tourController.topFiveTours, tourController.getAllTours);
 
+// GeoSpatial Route
+router
+  .route('/tour-within/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getWithin);
+
+router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
+
 // Statistics of the tour
 router.route('/statistics').get(tourController.getTourStats);
 

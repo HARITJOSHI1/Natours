@@ -1,4 +1,5 @@
 // Core modules
+const path = require('path');
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 
@@ -24,6 +25,10 @@ const Errors = require('./utils/Errors');
 // Turning ON Security Headers
 app.use(helmet());
 
+// Setting view engine
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
 // Environment setup
 if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
 
@@ -45,13 +50,13 @@ app.use(
       'ratingsAverage',
       'maxGroupSize',
       'difficulty',
-      'price'
-    ]
+      'price',
+    ],
   })
 );
 
 // Serving static files
-app.use(express.static(`${__dirname}/public`));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Request Limit
 const limiter = rateLimit({
