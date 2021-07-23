@@ -1,4 +1,5 @@
 // Core modules
+const path = require('path');
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 
@@ -13,7 +14,7 @@ const hpp = require('hpp');
 const app = express();
 const tourRoute = require('./routes/tourRoutes');
 const userRoute = require('./routes/userRoutes');
-// const reviewRoute = require('./routes/reviewRoutes');
+const reviewRoute = require('./routes/reviewRoutes');
 const AppError = require('./utils/AppError');
 const Errors = require('./utils/Errors');
 
@@ -22,7 +23,30 @@ const Errors = require('./utils/Errors');
 // GLOBAL APP MIDDLEWARE
 
 // Turning ON Security Headers
+// app.use(
+//   helmet.contentSecurityPolicy({
+//     directives: {
+//       defaultSrc: ["'self'"],
+//       scriptSrc: ["'self"],
+//     },
+//   })
+// );
+
 app.use(helmet());
+// app.use(function (req, res, next) {
+//   res.setHeader(
+//     'Content-Security-Policy',
+//     "default-src 'self'; script-src-attr 'self' http://localhost:8000/ 'sha256-xzi4zkCjuC8lZcD2UmnqDG0vurmq12W/XKM5Vd0+MlQ='; font-src 'self'; img-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css; frame-src 'self';"
+//   );
+//   next();
+// });
+
+// Setting up view templates
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
+// Serving static files
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Environment setup
 if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
@@ -34,7 +58,7 @@ app.use(express.json({ limit: '10kb' }));
 app.use(mongoSanitize());
 
 // Data Sanitization from XSS attacks (convert html entity into useless symbols)
-app.use(xss());
+// app.use(xss());
 
 // Prevention from parameter pollution (allowing some fields apart from it)
 app.use(
@@ -45,13 +69,10 @@ app.use(
       'ratingsAverage',
       'maxGroupSize',
       'difficulty',
-      'price'
-    ]
+      'price',
+    ],
   })
 );
-
-// Serving static files
-app.use(express.static(`${__dirname}/public`));
 
 // Request Limit
 const limiter = rateLimit({
@@ -62,12 +83,18 @@ const limiter = rateLimit({
 });
 
 // Apply limiter middleware in all the defined routes
-app.use('/api', limiter);
+app.use('/', limiter);
 
 // Mounting the router
+app.get('/', (req, res) => {
+  res.status(200).render('base', {
+    info: 'This is the root route !',
+  });
+});
+
 app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
-// app.use('/api/v1/reviews', reviewRoute);
+app.use('/api/v1/reviews', reviewRoute);
 
 // Handling unknown routes
 app.all('*', function (req, res, next) {
