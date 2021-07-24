@@ -41,7 +41,7 @@ app.use(express.json({ limit: '10kb' }));
 app.use(mongoSanitize());
 
 // Data Sanitization from XSS attacks (convert html entity into useless symbols)
-// app.use(xss());
+app.use(xss());
 
 // Prevention from parameter pollution (allowing some fields apart from it)
 app.use(
