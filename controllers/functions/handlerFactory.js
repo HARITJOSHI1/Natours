@@ -45,7 +45,9 @@ exports.readSingleOrAll = (Model, a = 'all') => {
   } else {
     return catchAsync(async (req, res) => {
       const totalDocs = await Model.countDocuments();
-      const features = new APIfeatures(Model.find(), req.query)
+      let fil = {};
+      if (req.params.id) fil = {tour: req.params.id};
+      const features = new APIfeatures(Model.find(fil), req.query)
         .filter()
         .sort()
         .fields()

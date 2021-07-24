@@ -15,31 +15,14 @@ const app = express();
 const tourRoute = require('./routes/tourRoutes');
 const userRoute = require('./routes/userRoutes');
 const reviewRoute = require('./routes/reviewRoutes');
+const viewRoute = require('./routes/viewRoutes');
 const AppError = require('./utils/AppError');
 const Errors = require('./utils/Errors');
 
 // ###########################################################
 
 // GLOBAL APP MIDDLEWARE
-
-// Turning ON Security Headers
-// app.use(
-//   helmet.contentSecurityPolicy({
-//     directives: {
-//       defaultSrc: ["'self'"],
-//       scriptSrc: ["'self"],
-//     },
-//   })
-// );
-
 app.use(helmet());
-// app.use(function (req, res, next) {
-//   res.setHeader(
-//     'Content-Security-Policy',
-//     "default-src 'self'; script-src-attr 'self' http://localhost:8000/ 'sha256-xzi4zkCjuC8lZcD2UmnqDG0vurmq12W/XKM5Vd0+MlQ='; font-src 'self'; img-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css; frame-src 'self';"
-//   );
-//   next();
-// });
 
 // Setting up view templates
 app.set('view engine', 'pug');
@@ -86,12 +69,7 @@ const limiter = rateLimit({
 app.use('/', limiter);
 
 // Mounting the router
-app.get('/', (req, res) => {
-  res.status(200).render('base', {
-    info: 'This is the root route !',
-  });
-});
-
+app.use('/', viewRoute)
 app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
 app.use('/api/v1/reviews', reviewRoute);
