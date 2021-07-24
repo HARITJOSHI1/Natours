@@ -61,7 +61,7 @@ reviewSchema.statics.calcAverageRating = async function (id) {
 
   if (stats.length > 0) {
     await Tour.findByIdAndUpdate(id, {
-      ratingsQuantity: stats[0].nRating,
+      ratingsQuantity: stats[0].nReviews,
       ratingsAverage: stats[0].avgRating
     });
   } else {
@@ -72,15 +72,20 @@ reviewSchema.statics.calcAverageRating = async function (id) {
   }
 };
 
+reviewSchema.post('save', function() {
+  // this points to current review
+  this.constructor.calcAverageRating(this.tour);
+})
 
 reviewSchema.pre(/^findOneAnd/, async function(next) {
   this.r = await this.findOne();
-  // console.log(this.r);
+  console.log(this.r);
   next();
 });
 
 reviewSchema.post(/^findOneAnd/, async function() {
   // await this.findOne(); does NOT work here, query has already executed
+  // console.log(this.r);
   await this.r.constructor.calcAverageRatings(this.r.tour);
 });
 

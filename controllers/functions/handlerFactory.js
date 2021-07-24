@@ -31,7 +31,7 @@ exports.readSingleOrAll = (Model, a = 'all') => {
 
       if (!resData) {
         const err = new AppError(
-          `Could not find any tour with that ID ${req.params.id}`,
+          `Could not find any document with that ID ${req.params.id}`,
           404
         );
         return next(err);
@@ -51,7 +51,6 @@ exports.readSingleOrAll = (Model, a = 'all') => {
         .filter()
         .sort()
         .fields()
-        .page(totalDocs)
 
       // Execute query
 
@@ -88,7 +87,7 @@ exports.updateData = (Model) =>
 
     if (!doc) {
       const err = new AppError(
-        `Could not find any tour with that ID ${req.params.id}`,
+        `Could not find any document with that ID ${req.params.id}`,
         404
       );
       return next(err);
