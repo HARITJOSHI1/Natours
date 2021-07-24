@@ -124,3 +124,79 @@ exports.getPlan = catchAsync(async (req, res, next) => {
     plan,
   });
 });
+
+// GeoSpatial handler
+exports.getWithin = catchAsync(async (req, res, next) => {
+  const { distance, latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+
+  // distance in radians
+  const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+
+  if (!lat || !lng) {
+    return next(
+      new AppError(
+        'Please specify the longitude and latitude of where you live',
+        400
+      )
+    );
+  }
+
+  // console.log(distance, latlng, unit);
+
+  const found = await tours.find({
+    startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
+  });
+
+  res.status(200).json({
+    status: 'success',
+    results: found.length,
+    data: {
+      found,
+    },
+  });
+});
+
+exports.getDistances = catchAsync(async (req, res, next) => {
+  const { latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+  const multipler = unit === 'mi' ? 0.000621371 : 0.001;
+
+  if (!lat || !lng) {
+    return next(
+      new AppError(
+        'Please specify the longitude and latitude of where you live',
+        400
+      )
+    );
+  }
+
+  // console.log(distance, latlng, unit);
+  const distances = await tours.aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [+lng, +lat],
+        },
+
+        distanceField: 'distance',
+        distanceMultiplier: multipler
+      },
+    },
+
+    {
+      $project: {
+        distance: 1,
+        name: 1
+      }
+    }
+
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: distances
+  });
+});
+
