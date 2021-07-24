@@ -29,6 +29,13 @@ router
 // Statistics of the tour
 router.route('/statistics').get(tourController.getTourStats);
 
+// GeoSpatial Route
+router
+  .route('/tour-within/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getWithin);
+
+router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
+
 // SOLUTION
 router
   .route('/get-busy-month/:year')
