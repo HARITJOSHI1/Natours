@@ -22,7 +22,11 @@ const Errors = require('./utils/Errors');
 // ###########################################################
 
 // GLOBAL APP MIDDLEWARE
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 
 // Setting up view templates
 app.set('view engine', 'pug');
@@ -69,7 +73,7 @@ const limiter = rateLimit({
 app.use('/', limiter);
 
 // Mounting the router
-app.use('/', viewRoute)
+app.use('/', viewRoute);
 app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
 app.use('/api/v1/reviews', reviewRoute);
