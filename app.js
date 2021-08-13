@@ -17,6 +17,7 @@ const userRoute = require('./routes/userRoutes');
 const reviewRoute = require('./routes/reviewRoutes');
 const viewRoute = require('./routes/viewRoutes');
 const AppError = require('./utils/AppError');
+const cookieParser = require('cookie-parser');
 const Errors = require('./utils/Errors');
 
 // ###########################################################
@@ -40,6 +41,7 @@ if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
 
 // Body parser, reading data from req.body upto a limit
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 
 // Data Sanitization from NoSQL injection in req.body and req.params
 app.use(mongoSanitize());
