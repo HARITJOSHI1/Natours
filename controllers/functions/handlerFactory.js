@@ -6,9 +6,9 @@ const Review = require('../../models/reviewModel');
 exports.deleteDoc = (Model) =>
   catchAsync(async (req, res, next) => {
     const id = req.params.id;
-    const deleteDoc = await Model.deleteOne({ _id: id });
+    const deleteDoc = await Model.findByIdAndDelete({ _id: id });
 
-    if (!deleteDoc.n) {
+    if (!deleteDoc) {
       const err = new AppError(
         `Could not find any document with that ID ${req.params.id}`,
         404
@@ -31,7 +31,7 @@ exports.readSingleOrAll = (Model, a = 'all') => {
 
       if (!resData) {
         const err = new AppError(
-          `Could not find any tour with that ID ${req.params.id}`,
+          `Could not find any document with that ID ${req.params.id}`,
           404
         );
         return next(err);
@@ -45,11 +45,12 @@ exports.readSingleOrAll = (Model, a = 'all') => {
   } else {
     return catchAsync(async (req, res) => {
       const totalDocs = await Model.countDocuments();
-      const features = new APIfeatures(Model.find(), req.query)
+      let fil = {};
+      if (req.params.id) fil = {tour: req.params.id};
+      const features = new APIfeatures(Model.find(fil), req.query)
         .filter()
         .sort()
         .fields()
-        .page(totalDocs)
 
       // Execute query
 
@@ -86,7 +87,7 @@ exports.updateData = (Model) =>
 
     if (!doc) {
       const err = new AppError(
-        `Could not find any tour with that ID ${req.params.id}`,
+        `Could not find any document with that ID ${req.params.id}`,
         404
       );
       return next(err);

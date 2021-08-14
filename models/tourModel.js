@@ -54,6 +54,7 @@ const tourSchema = new mongoose.Schema(
       default: 4.4,
       min: [0, 'Ratings should be in the range 0-5'],
       max: [5, 'Ratings should be in the range 0-5'],
+      set: val => Math.round(val * 10) / 10
     },
 
     ratingsQuantity: {
@@ -155,6 +156,9 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+tourSchema.index({price: 1, ratingsAverage: -1});
+tourSchema.index({slugs: 1});
+
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
@@ -229,15 +233,15 @@ tourSchema.post(/^find/, function (docs, next) {
 
 // #######################  AGGREGATION (mongoose) MIDDLEWARE  #############################
 
-tourSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({
-    $match: {
-      secretTour: { $ne: 'true' },
-    },
-  });
+// tourSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({
+//     $match: {
+//       secretTour: { $ne: 'true' },
+//     },
+//   });
 
-  next();
-});
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;
