@@ -8,6 +8,8 @@ const fs = require('fs');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const tour = require('./../../models/tourModel');
+const user = require('./../../models/userModel');
+const review = require('./../../models/reviewModel');
 
 dotenv.config({ path: './config.env' });
 
@@ -19,17 +21,31 @@ mongoose
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false,
+    useUnifiedTopology: true
   })
-  .then((con) => console.log('Database sucessfully connected'));
+  .then((con) => console.log('Database sucessfully connected [DEV-IMPORT]'));
 
 const readTours = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf8')
+  fs.readFileSync(`${__dirname}/tours.json`, 'utf8')
+);
+
+const readUsers = JSON.parse(
+  fs.readFileSync(`${__dirname}/users.json`, 'utf8')
+);
+
+const readReviews = JSON.parse(
+  fs.readFileSync(`${__dirname}/reviews.json`, 'utf8')
 );
 
 // Passing Array of object to create()
 const importDev = async () => {
   try {
-    const t = await tour.create(readTours);
+    await tour.create(readTours, { validateBeforeSave: false});
+
+    await user.create(readUsers, { validateBeforeSave: false});
+
+    await review.create(readReviews, { validateBeforeSave: false});
+
     console.log('Data successfully loaded !');
     process.exit(); // Brute exit
   } catch (error) {
@@ -40,7 +56,10 @@ const importDev = async () => {
 // Delete All the documents
 const deleteAllTour = async () => {
   try {
-    const d = await tour.deleteMany();
+    await tour.deleteMany();
+    await user.deleteMany();
+    await review.deleteMany();
+
     console.log('Data deleted successfully !');
     process.exit(); // Brute exit
   } catch (error) {

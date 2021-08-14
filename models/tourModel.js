@@ -1,116 +1,182 @@
 const mongoose = require('mongoose');
-const validator = require('validator')
+const validator = require('validator');
+const slugify = require('slugify');
 
-const tourSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'A tour field  must be provided'],
-    minLength: [2, 'A name should be greter than or equal to 2 characters'],
-    maxLength: [250, 'A name should be less than or equal to 250 characters'],
-    unique: true,
-    trim: true,
-    validate: [validator.isAlpha, 'Name of a tour must be a string']
-  },
+const tourSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, 'A tour field  must be provided'],
+      minLength: [2, 'A name should be greter than or equal to 2 characters'],
+      maxLength: [250, 'A name should be less than or equal to 250 characters'],
+      unique: true,
+      trim: true,
+      validate: {
+        validator: function (val) {
+          for (let i = 0; i < val.length; i++) {
+            if (Number(val[i])) {
+              return false;
+            }
+          }
+          return true;
+        },
 
-  duration: {
-    type: Number,
-    required: [true, 'A tour field must be provided'],
-  },
-
-  maxGroupSize: {
-    type: Number,
-    required: [true, 'A tour field must be provided'],
-  },
-
-  difficulty: {
-    type: String,
-    required: [true, 'A tour field must be provided'],
-    enum: {
-      values: ['easy', 'medium', 'difficult'],
-      message: 'Please select from easy, medium and difficult'
-    }
-  },
-
-  price: {
-    type: Number,
-    required: [true, 'A price field  must be provided'],
-  },
-
-  ratingsAverage: {
-    type: Number,
-    default: 4.4,
-    min: [0, 'Ratings should be in the range 0-5'],
-    max: [5, 'Ratings should be in the range 0-5']
-  },
-
-  ratingsQuantity: {
-    type: Number,
-    default: 0,
-  },
-
-  priceDiscount: {
-    type: Number,
-    validate: {
-      validator: function(val){
-
-        /* Can only use 'this' in validator with inserts and 
-         'this' will points to the current new document NOT ON UPDATES */
-        return val < this.price;
+        message: 'Name of a tour must be a string',
       },
-      message: 'The discount value({VALUE}) is higher than the price'
-    }
+    },
+
+    duration: {
+      type: Number,
+      required: [true, 'A tour field must be provided'],
+    },
+
+    maxGroupSize: {
+      type: Number,
+      required: [true, 'A tour field must be provided'],
+    },
+
+    difficulty: {
+      type: String,
+      required: [true, 'A tour field must be provided'],
+      enum: {
+        values: ['easy', 'medium', 'difficult'],
+        message: 'Please select from easy, medium and difficult',
+      },
+    },
+
+    price: {
+      type: Number,
+      required: [true, 'A price field  must be provided'],
+    },
+
+    ratingsAverage: {
+      type: Number,
+      default: 4.4,
+      min: [0, 'Ratings should be in the range 0-5'],
+      max: [5, 'Ratings should be in the range 0-5'],
+      set: val => Math.round(val * 10) / 10
+    },
+
+    ratingsQuantity: {
+      type: Number,
+      default: 0,
+    },
+
+    priceDiscount: {
+      type: Number,
+      validate: {
+        validator: function (val) {
+          /* Can only use 'this' in validator with inserts and 
+         'this' will points to the current new document NOT ON UPDATES */
+          return val < this.price;
+        },
+        message: 'The discount value({VALUE}) is higher than the price',
+      },
+    },
+
+    summary: {
+      type: String,
+      trim: true,
+      required: [true, 'A tour field must be provided'],
+    },
+
+    description: {
+      type: String,
+      trim: true,
+    },
+
+    imageCover: {
+      type: String,
+      required: [true, 'A tour field must be provided'],
+    },
+
+    images: {
+      type: [String],
+      required: [true, 'A tour field must be provided'],
+    },
+
+    createdAt: {
+      type: Date,
+      default: Date.now(),
+      required: [true, 'A tour field must be provided'],
+      select: false,
+    },
+
+    secretTour: {
+      type: 'Boolean',
+      default: false,
+    },
+
+    startLocation: {
+      // GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+
+      coordinates: [Number],
+      address: 'String',
+      description: 'String',
+      day: String
+    },
+
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+
+        coordinates: [Number],
+        address: 'String',
+        description: 'String',
+        day: String,
+      },
+    ],
+
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+    ],
+
+    slugs: String,
+
+    startDates: {
+      type: [Date],
+    },
   },
 
-  summary: {
-    type: String,
-    trim: true,
-    required: [true, 'A tour field must be provided'],
-  },
-
-  description: {
-    type: String,
-    trim: true,
-  },
-
-  imageCover: {
-    type: String,
-    required: [true, 'A tour field must be provided'],
-  },
-
-  images: {
-    type: [String],
-    required: [true, 'A tour field must be provided'],
-  },
-
-  createdAt: {
-    type: Date,
-    default: Date.now(),
-    required: [true, 'A tour field must be provided'],
-    select: false
-  },
-
-  secretTour: {
-    type: "Boolean",
-    default: false
-  },
-
-  startDates: {
-    type: [Date],
-  },
-},
-
-{
-  toJSON: {virtuals: true},
-  toObject: {virtuals: true}
-}
-
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
 
-tourSchema.virtual('durationWeeks').get(function (){
+tourSchema.index({price: 1, ratingsAverage: -1});
+tourSchema.index({slugs: 1});
+tourSchema.index({startLocation: '2dsphere'});
+
+tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+tourSchema.virtual('reviews', {
+  ref: 'Review', 
+  foreignField: 'tour',
+  localField: '_id'
+});
+
 // #######################  DOCUMENT (mongoose) MIDDLEWARE  #############################
+
+tourSchema.pre('save', function(next){
+  this.slugs = slugify(this.name, {lower: true});
+  next();
+});
+
 
 /* 
 
@@ -121,7 +187,7 @@ tourSchema.virtual('durationWeeks').get(function (){
 
 */
 
-tourSchema.pre('save', function(next){
+tourSchema.pre('save', function (next) {
   // console.log(this);
   next();
 });
@@ -138,39 +204,45 @@ tourSchema.pre('save', function(next){
 
 */
 
-tourSchema.post('save', function(doc, next){
+tourSchema.post('save', function (doc, next) {
   // console.log(this);
   next();
 });
 
-
 // #######################  QUERY (mongoose) MIDDLEWARE  #############################
 
-tourSchema.pre(/^find/, function(next){
-  this.find({secretTour: {$ne: 'true'}});
+tourSchema.pre(/^find/, function (next) {
+  this.find({ secretTour: { $ne: 'true' } });
   this.startTime = Date.now();
   next();
 });
 
-tourSchema.post(/^find/, function(docs, next){
+tourSchema.pre(/^find/, function(next){
+  
+  this.populate({
+    path: 'guides',
+    select: '-__v -active'
+  });
+  next();
+});
+
+tourSchema.post(/^find/, function (docs, next) {
   console.log(`Query took: ${(Date.now() - this.startTime) / 1000} sec`);
   next();
 });
 
+
 // #######################  AGGREGATION (mongoose) MIDDLEWARE  #############################
 
-tourSchema.pre('aggregate', function(next){
-  this.pipeline().unshift(
-    {
-      $match: {
-        secretTour: {$ne: 'true'}
-      }
-    }
-  );
+// tourSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({
+//     $match: {
+//       secretTour: { $ne: 'true' },
+//     },
+//   });
 
-  next();
-});
-
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;

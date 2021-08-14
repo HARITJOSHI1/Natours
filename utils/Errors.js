@@ -13,6 +13,15 @@ const handleDuplicateErrorDB = (e) => {
   return new AppError(`${e.errors.name.properties.path} field is required`, 400);
 }
 
+const handleInvalidJsonWebToken = (e) => {
+  return new AppError(e.message, 401);
+}
+ 
+const handleTokenExpire = (e) => {
+  return new AppError("Your token has already expired! Please login again", 401);
+}
+
+
 const setDevErr = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -58,6 +67,14 @@ module.exports = (err, req, res, next) => {
 
     if(error.kind === 'User defined'){
       error = handleDuplicateErrorDB(error);
+    }
+    
+    if(error.name === 'JsonWebTokenError'){
+      error = handleInvalidJsonWebToken(error);
+    }
+
+    if(error.name === 'TokenExpiredError'){
+      error = handleTokenExpire();
     }
 
     setProdErr(error, res);
