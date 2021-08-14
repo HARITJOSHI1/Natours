@@ -28,7 +28,6 @@ exports.postTour = factory.postData(tours);
 exports.updateTour = factory.updateData(tours);
 exports.deleteTour = factory.deleteDoc(tours);
 
-
 // _________________________________________________________________
 
 exports.getTourStats = catchAsync(async (req, res, next) => {
@@ -199,4 +198,3 @@ exports.getDistances = catchAsync(async (req, res, next) => {
     data: distances
   });
 });
-
