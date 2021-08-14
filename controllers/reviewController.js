@@ -4,19 +4,11 @@ const User = require('../models/userModel');
 const Tour = require('../models/tourModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
+const factory = require('./functions/handlerFactory');
 
-exports.getTopReviews = catchAsync(async (req, res) => {
-  // const topReviews = await Review.find({ ratings: { $gt: 3 } }).limit(10);
-  // const response = { status: 'success', topReviews };
-  // if (topReviews.length === 0) response.topReviews = "No reviews available";
-  // res.status(200).json(response);
-
-  const topReviews = await Review.find().sort('-createdAt');
-  const response = { status: 'success', topReviews };
-  if (topReviews.length === 0) response.topReviews = "No reviews available";
-  res.status(200).json(response);
-
-});
+exports.getTopReviews = factory.readSingleOrAll(Review);
+exports.getReview = factory.readSingleOrAll(Review, 'single');
+exports.deleteReview = factory.deleteDoc(Review);
 
 exports.postReview = catchAsync(async (req, res, next) => {
   const TOUR_ID = req.params.id;
@@ -40,5 +32,4 @@ exports.postReview = catchAsync(async (req, res, next) => {
     status: 'success',
     review: foundReview,
   });
-  next();
 });

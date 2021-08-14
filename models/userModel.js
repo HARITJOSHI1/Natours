@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
 
   role: {
     type: String,
-    enum: ['user', 'admin', 'guide', 'lead-guid'],
+    enum: ['user', 'admin', 'guide', 'lead-guide'],
     default: 'user',
   },
 
@@ -124,7 +124,7 @@ userSchema.methods.createResetPasswordToken = function () {
     .createHash('sha256')
     .update(resetToken)
     .digest('hex');
-  console.log({ resetToken });
+  console.log(this.resetToken);  
   this.passResetTokenexp = Date.now() + 10 * 60 * 1000;
   return resetToken;
 };

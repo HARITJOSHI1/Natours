@@ -102,12 +102,12 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   // 4. Check if user changed password after the token was issued
-  if (currentUser.changedPassword(decoded.iat)) {
-    return next(
-      new AppError('The password is changed so please login again'),
-      400
-    );
-  }
+  // if (currentUser.changedPassword(decoded.iat)) {
+  //   return next(
+  //     new AppError('The password is changed so please login again'),
+  //     400
+  //   );
+  // }
 
   req.user = currentUser;
   next();
@@ -157,10 +157,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       message,
     });
 
-    user.resetToken = undefined;
-    user.passResetTokenexp = undefined;
-    await user.save({ validateBeforeSave: false });
-
     res.status(200).json({
       status: 'success',
       message: 'Token send to email !',
@@ -186,8 +182,6 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     .update(req.params.token)
     .digest('hex');
 
-  console.log(hashedToken);
-
   const user = await User.findOne({
     resetToken: hashedToken,
     passResetTokenexp: { $gt: Date.now() },
@@ -201,8 +195,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordConfirm = req.body.passwordConfirm;
   user.resetToken = undefined;
   user.passResetTokenexp = undefined;
-  user.passwordConfirm = undefined;
-
+  
   await user.save();
 
   // 4. Log the user inside the app (send JWT)
