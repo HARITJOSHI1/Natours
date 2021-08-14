@@ -16,6 +16,7 @@ const router = express.Router();
 
 // Delegating to reviewRouter
 router.use('/:id/reviews', reviewRouter);
+router.use('/reviews', reviewRouter);
 
 // router.param('id', tourController.checkID);
 // router.use(tourController.checkData);
@@ -27,6 +28,13 @@ router
 
 // Statistics of the tour
 router.route('/statistics').get(tourController.getTourStats);
+
+// GeoSpatial Route
+router
+  .route('/tour-within/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getWithin);
+
+router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
 
 // SOLUTION
 router

@@ -1,4 +1,5 @@
 // Core modules
+const path = require('path');
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 
@@ -13,22 +14,34 @@ const hpp = require('hpp');
 const app = express();
 const tourRoute = require('./routes/tourRoutes');
 const userRoute = require('./routes/userRoutes');
-// const reviewRoute = require('./routes/reviewRoutes');
+const reviewRoute = require('./routes/reviewRoutes');
+const viewRoute = require('./routes/viewRoutes');
 const AppError = require('./utils/AppError');
+const cookieParser = require('cookie-parser');
 const Errors = require('./utils/Errors');
 
 // ###########################################################
 
 // GLOBAL APP MIDDLEWARE
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 
-// Turning ON Security Headers
-app.use(helmet());
+// Setting up view templates
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
+// Serving static files
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Environment setup
 if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
 
 // Body parser, reading data from req.body upto a limit
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 
 // Data Sanitization from NoSQL injection in req.body and req.params
 app.use(mongoSanitize());
@@ -45,13 +58,10 @@ app.use(
       'ratingsAverage',
       'maxGroupSize',
       'difficulty',
-      'price'
-    ]
+      'price',
+    ],
   })
 );
-
-// Serving static files
-app.use(express.static(`${__dirname}/public`));
 
 // Request Limit
 const limiter = rateLimit({
@@ -62,12 +72,13 @@ const limiter = rateLimit({
 });
 
 // Apply limiter middleware in all the defined routes
-app.use('/api', limiter);
+app.use('/', limiter);
 
 // Mounting the router
+app.use('/', viewRoute);
 app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
-// app.use('/api/v1/reviews', reviewRoute);
+app.use('/api/v1/reviews', reviewRoute);
 
 // Handling unknown routes
 app.all('*', function (req, res, next) {
