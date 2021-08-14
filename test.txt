@@ -37,3 +37,62 @@
   //     tour: ,
   //   },
   // });
+
+
+
+
+  Tours:
+
+  // exports.getSingleTour = catchAsync(async (req, res, next) => {
+
+//   const resData = await tours.findById(req.params.id).populate('reviews');
+
+//   if (!resData) {
+//     const err = new AppError(
+//       `Could not find any tour with that ID ${req.params.id}`,
+//       404
+//     );
+//     return next(err);
+//   }
+
+//   res.status(200).json({
+//     status: 'success',
+//     data: resData,
+//   });
+// });
+
+
+// exports.deleteTour = catchAsync(async (req, res, next) => {
+//   const id = req.params.id;
+//   const deleteTour = await tours.deleteOne({ _id: id });
+  
+//   if (!deleteTour.n) {
+//     const err = new AppError(
+//       `Could not find any tour with that ID ${req.params.id}`,
+//       404
+//     );
+//     return next(err);
+//   }
+
+//   res.status(200).json({
+//     status: 'success',
+//     message: `Deleted the document with id ${id}`,
+//   });
+// });
+
+
+
+Reviews:
+
+exports.getTopReviews = catchAsync(async (req, res) => {
+//   // const topReviews = await Review.find({ ratings: { $gt: 3 } }).limit(10);
+//   // const response = { status: 'success', topReviews };
+//   // if (topReviews.length === 0) response.topReviews = "No reviews available";
+//   // res.status(200).json(response);
+
+//   const topReviews = await Review.find().sort('-createdAt');
+//   const response = { status: 'success', topReviews };
+//   if (topReviews.length === 0) response.topReviews = "No reviews available";
+//   res.status(200).json(response);
+
+// });

@@ -105,7 +105,6 @@
     "startDates": ["2021-02-12,10:00", "2021-04-14,10:00", "2021-09-01,10:00"]
   },
   {
-    "id": 7,
     "name": "The Star Gazer",
     "duration": 9,
     "maxGroupSize": 8,

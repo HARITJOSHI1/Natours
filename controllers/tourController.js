@@ -1,19 +1,19 @@
 const express = require('express');
+const tours = require('../models/tourModel');
 
-// FEATURES OF OUR API Class:
-const APIfeatures = require('./APIFeatureClass');
+// Error Handlers
+const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/AppError');
 
-const tours = require('./../models/tourModel');
-const catchAsync = require('./../utils/catchAsync');
-const AppError = require('./../utils/AppError');
-const Errors = require('./../utils/Errors');
+// Factory functions
+const factory = require('./functions/handlerFactory');
 
 // #################################################################
 
 // FUNCTIONS
 
 // aliasing callBack
-exports.topFiveTours = async (req, next) => {
+exports.topFiveTours = async (req, res, next) => {
   req.query.limit = '5';
   req.query.sort = '-ratingsAverage,price';
   req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
@@ -22,98 +22,13 @@ exports.topFiveTours = async (req, next) => {
   next();
 };
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  const totalTours = await tours.countDocuments();
-  const features = new APIfeatures(tours.find(), req.query)
-    .filter()
-    .sort()
-    .fields()
-    .page(totalTours);
+exports.getAllTours = factory.readSingleOrAll(tours);
+exports.getSingleTour = factory.readSingleOrAll(tours, 'single');
+exports.postTour = factory.postData(tours);
+exports.updateTour = factory.updateData(tours);
+exports.deleteTour = factory.deleteDoc(tours);
 
-  // Execute query
-  const allTours = await features.query;
-
-  // Sending the response
-  res.status(200).json({
-    status: 'success',
-    results: allTours.length,
-    allTours,
-  });
-});
-
-exports.postTour = catchAsync(async (req, res) => {
-  const newTour = await tours.create(req.body);
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour: newTour,
-    },
-  });
-});
-
-exports.getSingleTour = catchAsync(async (req, res, next) => {
-  // const id = +req.params.id;
-  const resData = await tours.findById(req.params.id);
-  // let allTours = await tours.find();
-  // console.log(allTours);
-
-  // let resData = allTours.find((el, idx) => idx === id - 1);
-  // resData = JSON.stringify(resData);
-  // console.log(resData);
-
-  if (!resData) {
-    const err = new AppError(
-      `Could not find any tour with that ID ${req.params.id}`,
-      404
-    );
-    return next(err);
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: resData,
-  });
-});
-
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const id = await tours.findById(req.params.id);
-  const updatedTour = await tours.findByIdAndUpdate(id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!updatedTour) {
-    const err = new AppError(
-      `Could not find any tour with that ID ${req.params.id}`,
-      404
-    );
-    return next(err);
-  }
-
-  res.status(200).json({
-    status: 'success',
-    updatedTour,
-  });
-});
-
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  const id = req.params.id;
-  const deleteTour = await tours.deleteOne({ _id: id });
-  console.log(deleteTour);
-
-  if (!deleteTour.n) {
-    const err = new AppError(
-      `Could not find any tour with that ID ${req.params.id}`,
-      404
-    );
-    return next(err);
-  }
-
-  res.status(200).json({
-    status: 'success',
-    message: `Deleted the document with id ${id}`,
-  });
-});
+// _________________________________________________________________
 
 exports.getTourStats = catchAsync(async (req, res, next) => {
   const stats = await tours.aggregate([
@@ -206,5 +121,80 @@ exports.getPlan = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     plan,
+  });
+});
+
+// GeoSpatial handler
+exports.getWithin = catchAsync(async (req, res, next) => {
+  const { distance, latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+
+  // distance in radians
+  const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+
+  if (!lat || !lng) {
+    return next(
+      new AppError(
+        'Please specify the longitude and latitude of where you live',
+        400
+      )
+    );
+  }
+
+  // console.log(distance, latlng, unit);
+
+  const found = await tours.find({
+    startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
+  });
+
+  res.status(200).json({
+    status: 'success',
+    results: found.length,
+    data: {
+      found,
+    },
+  });
+});
+
+exports.getDistances = catchAsync(async (req, res, next) => {
+  const { latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+  const multipler = unit === 'mi' ? 0.000621371 : 0.001;
+
+  if (!lat || !lng) {
+    return next(
+      new AppError(
+        'Please specify the longitude and latitude of where you live',
+        400
+      )
+    );
+  }
+
+  // console.log(distance, latlng, unit);
+  const distances = await tours.aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [+lng, +lat],
+        },
+
+        distanceField: 'distance',
+        distanceMultiplier: multipler
+      },
+    },
+
+    {
+      $project: {
+        distance: 1,
+        name: 1
+      }
+    }
+
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: distances
   });
 });
