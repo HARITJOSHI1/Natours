@@ -25,7 +25,7 @@ exports.postReview = catchAsync(async (req, res, next) => {
 
   await Review.create(req.body);
   const foundReview = await Review.find({ tour: TOUR_ID })
-    .select('-__v')
+    .select('-__v', '-_id')
     .sort('-createdAt');
 
   res.status(200).json({
