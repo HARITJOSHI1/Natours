@@ -96,7 +96,7 @@ exports.isLoggedIn = async (req, res, next) => {
       return next();
     }
   }
-  next()
+  next();
 };
 
 // #####################################################################
@@ -267,4 +267,14 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
     message: 'Password updated successfully',
     token,
   });
+});
+
+// Logout
+exports.logout = catchAsync(async (req, res) => {
+  res.cookie('jwt', 'logged-out', {
+    expires: new Date(Date.now() + 1000 * 10),
+    httpOnly: true,
+  });
+
+  res.status(200).json({ status: 'loggedOut' });
 });

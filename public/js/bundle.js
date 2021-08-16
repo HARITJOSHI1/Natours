@@ -8488,7 +8488,7 @@ exports.renderAlert = renderAlert;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.login = void 0;
+exports.logout = exports.login = void 0;
 
 var _axios = _interopRequireDefault(require("axios"));
 
@@ -8529,7 +8529,7 @@ var login = /*#__PURE__*/function () {
           case 8:
             _context.prev = 8;
             _context.t0 = _context["catch"](0);
-            (0, _alert.renderAlert)("error", "Incorrect password or email");
+            (0, _alert.renderAlert)('error', 'Incorrect password or email');
 
           case 11:
           case "end":
@@ -8550,12 +8550,58 @@ var target = function target(res, path) {
   console.log(res);
 
   if (res.status === 'loggedIn') {
-    (0, _alert.renderAlert)("success", "Logged in successfully");
+    (0, _alert.renderAlert)('success', 'Logged in successfully');
     window.setTimeout(function () {
       location.assign(path);
     }, 1500);
   }
 };
+
+var logout = /*#__PURE__*/function () {
+  var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+    var _yield$axios2, res;
+
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _context2.prev = 0;
+            _context2.next = 3;
+            return (0, _axios.default)({
+              method: 'GET',
+              url: 'http://localhost:8000/api/v1/users/logout'
+            });
+
+          case 3:
+            _yield$axios2 = _context2.sent;
+            res = _yield$axios2.data;
+
+            if (res.status === 'loggedOut') {
+              location.assign('/');
+            }
+
+            _context2.next = 11;
+            break;
+
+          case 8:
+            _context2.prev = 8;
+            _context2.t0 = _context2["catch"](0);
+            (0, _alert.renderAlert)('error', 'There was an error is log out. Please try again later');
+
+          case 11:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2, null, [[0, 8]]);
+  }));
+
+  return function logout() {
+    return _ref2.apply(this, arguments);
+  };
+}();
+
+exports.logout = logout;
 },{"axios":"../../node_modules/axios/index.js","./alert":"alert.js"}],"index.js":[function(require,module,exports) {
 "use strict";
 
@@ -8828,10 +8874,15 @@ var _login = require("./login");
 // import { displayMap } from './mapbox';
 var email = document.getElementById('email');
 var pwd = document.getElementById('password');
-var form = document.querySelector('.form'); // const locations = document.getElementById('map').dataset.locations;
+var form = document.querySelector('.form');
+var logOutBtn = document.querySelector('.nav__el--logout'); // const locations = document.getElementById('map').dataset.locations;
 // if(locations){
 //     displayMap(locations);
 // }
+
+if (logOutBtn) {
+  logOutBtn.addEventListener('click', _login.logout);
+}
 
 if (form) {
   form.addEventListener('submit', function (event) {
