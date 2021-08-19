@@ -36,10 +36,6 @@ app.set('views', path.join(__dirname, 'views'));
 // Serving static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Setting view engine
-app.set('view engine', 'pug');
-app.set('views', path.join(__dirname, 'views'));
-
 // Environment setup
 if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
 
