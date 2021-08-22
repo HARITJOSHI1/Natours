@@ -3,6 +3,7 @@ import { renderAlert } from './alert';
 
 export const login = async (email, password) => {
   try {
+    console.log(password);
     const { data: res } = await axios({
       method: 'POST',
       url: 'http://localhost:8000/api/v1/users/login',

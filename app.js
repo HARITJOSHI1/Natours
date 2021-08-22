@@ -41,6 +41,7 @@ if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
 
 // Body parser, reading data from req.body upto a limit
 app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Data Sanitization from NoSQL injection in req.body and req.params
@@ -62,7 +63,6 @@ app.use(
     ],
   })
 );
-
 
 // Request Limit
 const limiter = rateLimit({

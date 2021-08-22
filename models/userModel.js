@@ -79,7 +79,7 @@ const userSchema = new mongoose.Schema({
 // Encrypt passwords:
 userSchema.pre('save', async function (next) {
   // runs if password was actually modified
-  if (!this.isModified('password')) return next();
+  // if (!this.isModified('password')) return next();
 
   // Hashing password with cost 12
   this.password = await bcrypt.hash(this.password, 12); // returns promise
