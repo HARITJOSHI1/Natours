@@ -29,3 +29,12 @@ exports.getLogin = catchAsync(async(req, res) => {
     title: 'Login'
   });
 });
+
+exports.getMe = catchAsync(async(req, res) => {
+  const {name, email, role, photo} = req.user;
+  res.status(200).render('dashboard', {title: 'me', name, email, role, photo});
+});
+
+// exports.updateUser = catchAsync(async(req, res) => {
+//   console.log('UPDATING USER' + req.body);
+// });

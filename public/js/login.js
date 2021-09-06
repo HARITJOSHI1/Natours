@@ -1,11 +1,9 @@
-import axios from "axios";
-
-const email = document.getElementById('email');
-const pwd = document.getElementById('password');
-const form = document.querySelector('.form');
+import axios from 'axios';
+import { renderAlert } from './alert';
 
 export const login = async (email, password) => {
   try {
+    console.log(password);
     const { data: res } = await axios({
       method: 'POST',
       url: 'http://localhost:8000/api/v1/users/login',
@@ -14,23 +12,37 @@ export const login = async (email, password) => {
         password,
       },
     });
+
     target(res, '/');
   } catch (err) {
-    console.log(err.message);
+    renderAlert('error', 'Incorrect password or email');
   }
 };
 
 const target = (res, path) => {
   console.log(res);
   if (res.status === 'loggedIn') {
-    alert('Logged in successfully');
+    renderAlert('success', 'Logged in successfully');
     window.setTimeout(() => {
       location.assign(path);
     }, 1500);
   }
 };
 
-form.addEventListener('submit', function (event) {
-  event.preventDefault();
-  login(email.value, pwd.value);
-});
+export const logout = async () => {
+  try {
+    const { data: res } = await axios({
+      method: 'GET',
+      url: 'http://localhost:8000/api/v1/users/logout',
+    });
+
+    if (res.status === 'loggedOut') {
+      location.assign('/');
+    }
+  } catch (err) {
+    renderAlert(
+      'error',
+      'There was an error is log out. Please try again later'
+    );
+  }
+};

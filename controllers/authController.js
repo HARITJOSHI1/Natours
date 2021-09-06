@@ -96,7 +96,7 @@ exports.isLoggedIn = async (req, res, next) => {
       return next();
     }
   }
-  next()
+  next();
 };
 
 // #####################################################################
@@ -248,16 +248,25 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   // 2. Verify the posted password
   const pass = req.body.password;
   const passConfirm = req.body.passConfirm;
-  if (passConfirm !== user.password) {
+  const currPass = req.body?.currPass;
+
+  if (!(await user.correctPassword(currPass, user.password))) {
+    return next(new AppError('Your current password is incorrect', 400));
+  }
+
+  if (passConfirm !== pass) {
     return next(new AppError('Password is incorrect', 400));
   }
 
   // 3. Update the password
-  await User.updateOne(
-    { _id: user._id },
-    { $set: { password: pass } },
-    { new: true, runValidators: true }
-  );
+  // await User.updateOne(
+  //   { _id: user._id },
+  //   { $set: { password: pass } },
+  //   { new: true, runValidators: true }
+  // );
+  user.password = pass;
+
+  await user.save({ validateBeforeSave: false });
 
   // 4. Log in the user
   const token = signToken(user._id);
@@ -267,4 +276,14 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
     message: 'Password updated successfully',
     token,
   });
+});
+
+// Logout
+exports.logout = catchAsync(async (req, res) => {
+  res.cookie('jwt', 'logged-out', {
+    expires: new Date(Date.now() + 1000 * 10),
+    httpOnly: true,
+  });
+
+  res.status(200).json({ status: 'loggedOut' });
 });
