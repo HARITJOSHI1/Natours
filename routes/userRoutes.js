@@ -33,7 +33,12 @@ router.patch('/updatePassword', authController.updatePassword);
 router.get('/me', userController.getId, userController.getMe);
 
 // Update Me
-router.patch('/updateMe', userController.updateMe);
+router.patch(
+  '/updateMe',
+  userController.uploadImg,
+  userController.resizeImg,
+  userController.updateMe
+);
 
 // Delete / Deactivate Me
 router.delete('/deleteMe', userController.deleteMe);

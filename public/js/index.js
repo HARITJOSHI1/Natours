@@ -7,6 +7,7 @@ import { updateUserInfo, updatePassword } from './updateUserInfo';
 const email = document.getElementById('email');
 const name = document.getElementById('name');
 const pwd = document.getElementById('password');
+const f = document.getElementById('photo');
 
 const currPass = document.getElementById('password-current');
 const pass = document.getElementById('password');
@@ -35,12 +36,16 @@ if (form1) {
 } else if (form2) {
   form2.addEventListener('submit', (e) => {
     e.preventDefault();
-    updateUserInfo(email.value, name.value);
+    const form = new FormData();
+    form.append('name', name.value);
+    form.append('email', email.value);
+    form.append('photo', f.files[0]);
+
+    updateUserInfo(form);
   });
 }
 
 if (form3) {
-  console.log('FORM 3');
   form3.addEventListener('submit', (e) => {
     console.log('Entered');
     e.preventDefault();

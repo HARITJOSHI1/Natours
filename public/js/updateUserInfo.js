@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-export const updateUserInfo = async (email, name) => {
+export const updateUserInfo = async (formData) => {
   const { data } = await axios.patch(
     'http://localhost:8000/api/v1/users/updateMe',
-    { name, email }
+    formData
   );
 
   console.log(data);

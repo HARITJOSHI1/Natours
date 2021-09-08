@@ -32,7 +32,7 @@ exports.getLogin = catchAsync(async(req, res) => {
 
 exports.getMe = catchAsync(async(req, res) => {
   const {name, email, role, photo} = req.user;
-  res.status(200).render('dashboard', {title: 'me', name, email, role, photo});
+  res.status(200).render('dashboard', {title: 'Your account', name, email, role, photo});
 });
 
 // exports.updateUser = catchAsync(async(req, res) => {
