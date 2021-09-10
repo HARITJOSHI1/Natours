@@ -55,7 +55,7 @@ const setProdErr = (err, req, res) => {
         message: err.message,
       });
     }
-
+    console.log(err);
     return res.status(err.statusCode).json({
       status: 'error',
       message: 'Something went wrong !',
