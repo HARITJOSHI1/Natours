@@ -1,6 +1,7 @@
 import '@babel/polyfill';
 import { login, logout } from './login';
 import { updateUserInfo, updatePassword } from './updateUserInfo';
+import { bookTour } from './stripe';
 
 // import { displayMap } from './mapbox';
 
@@ -18,6 +19,7 @@ const form2 = document.querySelector('.form-user-data');
 const form3 = document.querySelector('.form-user-settings');
 
 const logOutBtn = document.querySelector('.nav__el--logout');
+const bookTourBtn = document.getElementById('book-tour');
 
 // const locations = document.getElementById('map').dataset.locations;
 // if(locations){
@@ -50,5 +52,13 @@ if (form3) {
     console.log('Entered');
     e.preventDefault();
     updatePassword(pass.value, repass.value, currPass.value);
+  });
+}
+
+if (bookTourBtn) {
+  bookTourBtn.addEventListener('click', (e) => {
+    e.target.textContent = 'Processing...';
+    const { tourId } = e.target.dataset;
+    bookTour(tourId);
   });
 }

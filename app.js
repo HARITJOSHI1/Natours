@@ -12,10 +12,14 @@ const hpp = require('hpp');
 
 // App level modules
 const app = express();
+
+// Routes
 const tourRoute = require('./routes/tourRoutes');
 const userRoute = require('./routes/userRoutes');
 const reviewRoute = require('./routes/reviewRoutes');
+const bookingRoute = require('./routes/bookingRoutes');
 const viewRoute = require('./routes/viewRoutes');
+
 const AppError = require('./utils/AppError');
 const cookieParser = require('cookie-parser');
 const Errors = require('./utils/Errors');
@@ -80,6 +84,7 @@ app.use('/', viewRoute);
 app.use('/api/v1/tours', tourRoute);
 app.use('/api/v1/users', userRoute);
 app.use('/api/v1/reviews', reviewRoute);
+app.use('/api/v1/bookings', bookingRoute);
 
 // Handling unknown routes
 app.all('*', function (req, res, next) {
