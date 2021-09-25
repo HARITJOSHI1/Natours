@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { renderAlert } from './alert';
-
+console.log("Hiiiii");
 export const login = async (email, password) => {
   try {
     const { data: res } = await axios({

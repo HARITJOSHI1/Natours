@@ -26,6 +26,7 @@ const bookTourBtn = document.getElementById('book-tour');
 //     displayMap(locations);
 // }
 
+
 if (logOutBtn) {
   logOutBtn.addEventListener('click', logout);
 }
