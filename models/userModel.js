@@ -124,8 +124,7 @@ userSchema.methods.createResetPasswordToken = function () {
   this.resetToken = crypto
     .createHash('sha256')
     .update(resetToken)
-    .digest('hex');
-  console.log(this.resetToken);  
+    .digest('hex'); 
   this.passResetTokenexp = Date.now() + 10 * 60 * 1000;
   return resetToken;
 };

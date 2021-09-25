@@ -49,7 +49,6 @@ if (form1) {
 
 if (form3) {
   form3.addEventListener('submit', (e) => {
-    console.log('Entered');
     e.preventDefault();
     updatePassword(pass.value, repass.value, currPass.value);
   });

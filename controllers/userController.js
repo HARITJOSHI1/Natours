@@ -70,7 +70,6 @@ exports.deleteUser = factory.deleteDoc(User);
 exports.getMe = factory.readSingleOrAll(User, 'single');
 
 exports.updateMe = catchAsync(async (req, res, next) => {
-  console.log(req.file, req.body);
   if (req.body.password || req.body.confirmPassword) {
     return next(new AppError('This route is not for updating password', 400));
   }

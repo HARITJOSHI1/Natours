@@ -8509,35 +8509,34 @@ var login = /*#__PURE__*/function () {
         switch (_context.prev = _context.next) {
           case 0:
             _context.prev = 0;
-            console.log(password);
-            _context.next = 4;
+            _context.next = 3;
             return (0, _axios.default)({
               method: 'POST',
-              url: 'http://localhost:8000/api/v1/users/login',
+              url: '/api/v1/users/login',
               data: {
                 email: email,
                 password: password
               }
             });
 
-          case 4:
+          case 3:
             _yield$axios = _context.sent;
             res = _yield$axios.data;
             target(res, '/');
-            _context.next = 12;
+            _context.next = 11;
             break;
 
-          case 9:
-            _context.prev = 9;
+          case 8:
+            _context.prev = 8;
             _context.t0 = _context["catch"](0);
             (0, _alert.renderAlert)('error', 'Incorrect password or email');
 
-          case 12:
+          case 11:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 9]]);
+    }, _callee, null, [[0, 8]]);
   }));
 
   return function login(_x, _x2) {
@@ -8548,8 +8547,6 @@ var login = /*#__PURE__*/function () {
 exports.login = login;
 
 var target = function target(res, path) {
-  console.log(res);
-
   if (res.status === 'loggedIn') {
     (0, _alert.renderAlert)('success', 'Logged in successfully');
     window.setTimeout(function () {
@@ -8570,7 +8567,7 @@ var logout = /*#__PURE__*/function () {
             _context2.next = 3;
             return (0, _axios.default)({
               method: 'GET',
-              url: 'http://localhost:8000/api/v1/users/logout'
+              url: '/api/v1/users/logout'
             });
 
           case 3:
@@ -8628,14 +8625,13 @@ var updateUserInfo = /*#__PURE__*/function () {
         switch (_context.prev = _context.next) {
           case 0:
             _context.next = 2;
-            return _axios.default.patch('http://localhost:8000/api/v1/users/updateMe', formData);
+            return _axios.default.patch('/api/v1/users/updateMe', formData);
 
           case 2:
             _yield$axios$patch = _context.sent;
             data = _yield$axios$patch.data;
-            console.log(data);
 
-          case 5:
+          case 4:
           case "end":
             return _context.stop();
         }
@@ -8658,20 +8654,18 @@ var updatePassword = /*#__PURE__*/function () {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            console.log('Pass update');
-            _context2.next = 3;
-            return _axios.default.patch('http://localhost:8000/api/v1/users/updatePassword', {
+            _context2.next = 2;
+            return _axios.default.patch('/api/v1/users/updatePassword', {
               password: pass,
               passConfirm: repass,
               currPass: currPass
             });
 
-          case 3:
+          case 2:
             _yield$axios$patch2 = _context2.sent;
             data = _yield$axios$patch2.data;
-            console.log(data);
 
-          case 6:
+          case 4:
           case "end":
             return _context2.stop();
         }
@@ -8703,7 +8697,7 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-var stripe = Stripe('pk_test_51JY3ZpSEnWLXGl16WnSOKVfBS0V9ked1X59IimsZLm9LzI0KHui6k0jV8tv2l9OsUYWB5OrL870s5oRFjJbfmwAw003RAKFVd4');
+var stripe = Stripe(undefined);
 
 var bookTour = /*#__PURE__*/function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(tourId) {
@@ -8714,7 +8708,7 @@ var bookTour = /*#__PURE__*/function () {
           case 0:
             _context.prev = 0;
             _context.next = 3;
-            return (0, _axios.default)("http://localhost:8000/api/v1/bookings/checkout-session/".concat(tourId));
+            return (0, _axios.default)("/api/v1/bookings/checkout-session/".concat(tourId));
 
           case 3:
             session = _context.sent;
@@ -9056,7 +9050,6 @@ if (form1) {
 
 if (form3) {
   form3.addEventListener('submit', function (e) {
-    console.log('Entered');
     e.preventDefault();
     (0, _updateUserInfo.updatePassword)(pass.value, repass.value, currPass.value);
   });
@@ -9097,7 +9090,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "33997" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "45847" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

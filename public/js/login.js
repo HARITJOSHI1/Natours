@@ -3,10 +3,9 @@ import { renderAlert } from './alert';
 
 export const login = async (email, password) => {
   try {
-    console.log(password);
     const { data: res } = await axios({
       method: 'POST',
-      url: 'http://localhost:8000/api/v1/users/login',
+      url: '/api/v1/users/login',
       data: {
         email,
         password,
@@ -20,7 +19,6 @@ export const login = async (email, password) => {
 };
 
 const target = (res, path) => {
-  console.log(res);
   if (res.status === 'loggedIn') {
     renderAlert('success', 'Logged in successfully');
     window.setTimeout(() => {
@@ -33,7 +31,7 @@ export const logout = async () => {
   try {
     const { data: res } = await axios({
       method: 'GET',
-      url: 'http://localhost:8000/api/v1/users/logout',
+      url: '/api/v1/users/logout',
     });
 
     if (res.status === 'loggedOut') {
