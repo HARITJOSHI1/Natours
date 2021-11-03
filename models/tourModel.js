@@ -103,7 +103,7 @@ const tourSchema = new mongoose.Schema(
     },
 
     secretTour: {
-      type: 'Boolean',
+      type: Boolean,
       default: false,
     },
 

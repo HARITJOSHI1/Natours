@@ -56,7 +56,7 @@ module.exports = class APIfeatures {
     }
 
     if (total <= skip) {
-      throw new Error('Page out not found');
+      throw new Error('Page not found');
     }
     return this;
   };

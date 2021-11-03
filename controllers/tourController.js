@@ -109,7 +109,7 @@ exports.getTourStats = catchAsync(async (req, res, next) => {
 
   if (!stats) {
     const err = new AppError(
-      `Could not find any tour with that ID ${req.params.id}`,
+      `Could not find any stats as no tour exists`,
       404
     );
     return next(err);
@@ -166,7 +166,7 @@ exports.getPlan = catchAsync(async (req, res, next) => {
 
   if (plan.length === 0 || !plan) {
     const err = new AppError(
-      `Could not find any tour with that ID ${req.params.id}`,
+      `Could not find any tour in the year ${year}`,
       404
     );
     return next(err);
